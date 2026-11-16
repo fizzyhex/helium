@@ -1,6 +1,6 @@
 --- a/chrome/browser/ui/ui_features.h
 +++ b/chrome/browser/ui/ui_features.h
-@@ -24,6 +24,9 @@ BASE_DECLARE_FEATURE(kBookmarkOpenAllCon
+@@ -24,6 +24,9 @@
  BASE_DECLARE_FEATURE(kUseActionsForBrowserCommands);
  bool ShouldUseActionsForBrowserCommands();
  
@@ -12,7 +12,7 @@
  BASE_DECLARE_FEATURE(kCtrlTabMru);
 --- a/chrome/browser/ui/ui_features.cc
 +++ b/chrome/browser/ui/ui_features.cc
-@@ -26,6 +26,16 @@ BASE_FEATURE(kBookmarkOpenAllConfirmatio
+@@ -26,6 +26,16 @@
  // TODO: Re-enable once Helium's browser commands are migrated to actions.
  BASE_FEATURE(kUseActionsForBrowserCommands, base::FEATURE_DISABLED_BY_DEFAULT);
  
@@ -31,7 +31,7 @@
  #if BUILDFLAG(IS_WIN)
 --- a/chrome/browser/helium_flag_choices.h
 +++ b/chrome/browser/helium_flag_choices.h
-@@ -42,6 +42,8 @@ constexpr const char kDisableEchCommandL
+@@ -42,6 +42,8 @@
  constexpr const char kHeliumSplitClientHelloCommandLine[] =
      "helium-split-clienthello";
  
@@ -55,7 +55,7 @@
  #endif  // CHROME_BROWSER_HELIUM_FLAG_ENTRIES_H_
 --- a/chrome/common/pref_names.h
 +++ b/chrome/common/pref_names.h
-@@ -617,6 +617,11 @@ inline constexpr char kShiftRightClickCo
+@@ -617,6 +617,11 @@
  // frame.
  inline constexpr char kHeliumRoundedFrame[] = "helium.browser.rounded_frame";
  
@@ -69,7 +69,7 @@
  
 --- a/chrome/browser/ui/browser_ui_prefs.cc
 +++ b/chrome/browser/ui/browser_ui_prefs.cc
-@@ -138,6 +138,8 @@ void RegisterBrowserUserPrefs(user_prefs
+@@ -138,6 +138,8 @@
  
    registry->RegisterBooleanPref(prefs::kHeliumRoundedFrame, true);
  
@@ -80,7 +80,7 @@
    registry->RegisterBooleanPref(prefs::kHeliumMinimalLocationBar, false);
 --- a/chrome/browser/extensions/api/settings_private/prefs_util.cc
 +++ b/chrome/browser/extensions/api/settings_private/prefs_util.cc
-@@ -235,6 +235,8 @@ const PrefsUtil::TypedPrefMap& PrefsUtil
+@@ -235,6 +235,8 @@
        settings_api::PrefType::kBoolean;
    (*s_allowlist)[::prefs::kHeliumZenModeTopChromePinned] =
        settings_api::PrefType::kBoolean;
@@ -106,7 +106,7 @@
      </message>
 --- a/chrome/browser/ui/webui/settings/settings_localized_strings_provider.cc
 +++ b/chrome/browser/ui/webui/settings/settings_localized_strings_provider.cc
-@@ -635,6 +635,9 @@ void AddAppearanceStrings(content::WebUI
+@@ -635,6 +635,9 @@
        {"openNewTabNextToActive", IDS_SETTINGS_NEW_TAB_NEXT_TO_ACTIVE_BUTTON},
        {"cycleTabsInMRUOrder", IDS_SETTINGS_CYCLE_TABS_IN_MRU_ORDER},
        {"roundedFrame", IDS_SETTINGS_ROUNDED_FRAME},
@@ -116,7 +116,7 @@
        {"layoutPageTitle", IDS_SETTINGS_LAYOUT},
        {"browserLayout", IDS_SETTINGS_BROWSER_LAYOUT},
        {"browserLayoutClassic", IDS_SETTINGS_BROWSER_LAYOUT_CLASSIC},
-@@ -739,6 +742,8 @@ void AddAppearanceStrings(content::WebUI
+@@ -739,6 +742,8 @@
        "showEverythingMenuEnabled",
        tab_groups::SavedTabGroupUtils::IsEnabledForProfile(profile));
  
@@ -127,7 +127,7 @@
    html_source->AddBoolean(
 --- a/chrome/browser/resources/settings/appearance_page/appearance_page.ts
 +++ b/chrome/browser/resources/settings/appearance_page/appearance_page.ts
-@@ -170,6 +170,7 @@ export class SettingsAppearancePageEleme
+@@ -170,6 +170,7 @@
        showManagedThemeDialog_: {type: Boolean},
        glassEffectOptions_: {type: Array},
        tabStripOptions_: {type: Array},
@@ -135,7 +135,7 @@
        showGlassEffectEnabled_: {type: Boolean},
        ntpSimplificationBookmarksBarEnabled_: {type: Boolean},
        bookmarksBarOptions_: {type: Array},
-@@ -295,6 +296,8 @@ export class SettingsAppearancePageEleme
+@@ -295,6 +296,8 @@
    protected accessor showHoverCardImagesOption_: boolean =
        loadTimeData.getBoolean('showHoverCardImagesOption');
    protected accessor showManagedThemeDialog_: boolean = false;
@@ -146,7 +146,7 @@
    protected accessor ntpSimplificationBookmarksBarEnabled_: boolean =
 --- a/chrome/browser/resources/settings/appearance_page/appearance_page.html.ts
 +++ b/chrome/browser/resources/settings/appearance_page/appearance_page.html.ts
-@@ -70,6 +70,12 @@ export function getHtml(this: SettingsAp
+@@ -70,6 +70,12 @@
          pref-key="helium.browser.rounded_frame"
          label="$i18n{roundedFrame}">
      </settings-toggle-button>
@@ -161,7 +161,7 @@
          pref-key="browser.show_home_button" label="$i18n{showHomeButton}"
 --- /dev/null
 +++ b/chrome/browser/ui/views/helium/native_frame_materials.h
-@@ -0,0 +1,70 @@
+@@ -0,0 +1,81 @@
 +// Copyright 2026 The Helium Authors
 +// You can use, redistribute, and/or modify this source code under
 +// the terms of the GPL-3.0 license that can be found in the LICENSE file.
@@ -169,6 +169,7 @@
 +#ifndef CHROME_BROWSER_UI_VIEWS_HELIUM_NATIVE_FRAME_MATERIALS_H_
 +#define CHROME_BROWSER_UI_VIEWS_HELIUM_NATIVE_FRAME_MATERIALS_H_
 +
++#include <array>
 +#include <optional>
 +
 +#include "third_party/skia/include/core/SkColor.h"
@@ -228,6 +229,16 @@
 +// Returns nullopt where floating surfaces stay opaque.
 +std::optional<SkColor> GetNativeFrameMaterialFloatingColor(
 +    const views::View* view);
++
++// How much surfaces painted with the material tint blur what is below them.
++// Strong enough that page text below them does not compete with what they
++// show.
++inline constexpr float kNativeFrameMaterialBlurRadius = 30.0f;
++
++// Evenly spaced steps of an eased fade, from 0 to 1, so that a fade in does
++// not start with an edge.
++inline constexpr std::array<float, 5> kNativeFrameMaterialFadeIn = {
++    0.0f, 0.156f, 0.5f, 0.844f, 1.0f};
 +
 +}  // namespace helium
 +
@@ -426,7 +437,7 @@
  #include "chrome/browser/ui/views/tabs/tab_strip.h"
  #include "chrome/grit/theme_resources.h"
  #include "ui/base/theme_provider.h"
-@@ -52,6 +53,10 @@ ThemedBackground::ThemedBackground(Brows
+@@ -52,6 +53,10 @@
      : browser_view_(browser_view), theme_choice_(theme_choice) {}
  
  void ThemedBackground::Paint(gfx::Canvas* canvas, views::View* view) const {
@@ -437,7 +448,7 @@
    PaintBackground(canvas, view, browser_view_, theme_choice_);
  }
  
-@@ -121,6 +126,10 @@ std::optional<SkColor> ThemedBackground:
+@@ -121,6 +126,10 @@
      ThemeChoice theme_choice) {
    std::pair<int, ui::ColorId> theme_choice_info =
        GetThemeChoiceInfo(theme_choice, view);
@@ -473,7 +484,7 @@
  }
  
  MultiContentsBackgroundView::~MultiContentsBackgroundView() = default;
-@@ -30,26 +37,31 @@ const gfx::RoundedCornersF& MultiContent
+@@ -30,26 +37,31 @@
  
  void MultiContentsBackgroundView::OnThemeChanged() {
    views::View::OnThemeChanged();
@@ -511,7 +522,7 @@
  void MultiContentsBackgroundView::UpdateSolidLayerColor() {
 --- a/chrome/browser/ui/views/frame/custom_corners_background.h
 +++ b/chrome/browser/ui/views/frame/custom_corners_background.h
-@@ -87,6 +87,10 @@ class CustomCornersBackground : public v
+@@ -87,6 +87,14 @@
    void SetVisible(bool visible);
    bool is_visible() const { return visible_; }
  
@@ -519,38 +530,56 @@
 +  // materials are active.
 +  void SetPaintWithNativeFrameMaterials(bool paint);
 +
++  // Scales how opaque the native frame material tint is, and how much it
++  // blurs, so that it can fade in and out along with what is below it.
++  void SetNativeFrameMaterialOpacity(float opacity);
++
    // Sets the color to paint the primary area of the view.
    void SetPrimaryColor(ColorChoiceWithAlpha primary_color);
    void SetPrimaryColor(ColorChoice primary_color) {
-@@ -173,6 +177,7 @@ class CustomCornersBackground : public v
+@@ -114,7 +122,10 @@
+   // Setting to true requires the following:
+   //  - Host view has a layer.
+   //  - Corners have already been updated for the current frame.
+-  void SetUseBackgroundBlur(bool use_background_blur);
++  // |clip|, in the view's coordinates, limits what is blurred, so that the
++  // blur does not take in what is outside of it.
++  void SetUseBackgroundBlur(bool use_background_blur,
++                            std::optional<gfx::Rect> clip = std::nullopt);
+ 
+   // Takes the inverse of a view with a CustomCornersBackground - i.e. it cuts
+   // out the corners, not the background area.
+@@ -173,6 +184,8 @@
    Outline GetMirroredOutline() const;
  
    bool visible_ = true;
 +  bool paint_with_native_frame_materials_ = false;
++  float native_frame_material_opacity_ = 1.0f;
    ColorChoiceWithAlpha primary_color_;
    ColorChoiceWithAlpha corner_color_;
    int default_radius_;
 --- a/chrome/browser/ui/views/frame/custom_corners_background.cc
 +++ b/chrome/browser/ui/views/frame/custom_corners_background.cc
-@@ -20,6 +20,7 @@
+@@ -10,6 +10,7 @@
+ #include <variant>
+ 
+ #include "base/i18n/rtl.h"
++#include "base/numerics/safe_conversions.h"
+ #include "build/build_config.h"
+ #include "chrome/browser/ui/color/chrome_color_provider_utils.h"
+ #include "chrome/browser/ui/layout_constants.h"
+@@ -20,8 +21,10 @@
  #include "chrome/browser/ui/views/frame/custom_floating_corner.h"
  #include "chrome/browser/ui/views/frame/safe_invoke/safe_invoke.h"
  #include "chrome/browser/ui/views/frame/themed_background.h"
 +#include "chrome/browser/ui/views/helium/native_frame_materials.h"
  #include "third_party/skia/include/core/SkPath.h"
  #include "third_party/skia/include/core/SkPathBuilder.h"
++#include "third_party/skia/include/pathops/SkPathOps.h"
  #include "ui/base/ui_base_features.h"
-@@ -41,6 +42,9 @@
- namespace {
- // Radius of the corner blur used for the glass frame.
- constexpr float kBackgroundBlurRadius = 5.0f;
-+// Strong enough that page text below a floating surface does not compete
-+// with its contents.
-+constexpr float kNativeFrameMaterialBlurRadius = 30.0f;
- 
- int CornerToRadius(const CustomCornersBackground::Corner& corner,
-                    int default_radius) {
-@@ -95,6 +99,15 @@ void CustomCornersBackground::SetVisible
+ #include "ui/color/color_id.h"
+ #include "ui/color/color_variant.h"
+@@ -95,6 +98,26 @@
    view_->SchedulePaint();
  }
  
@@ -563,25 +592,72 @@
 +  view_->SchedulePaint();
 +}
 +
++void CustomCornersBackground::SetNativeFrameMaterialOpacity(float opacity) {
++  if (native_frame_material_opacity_ == opacity) {
++    return;
++  }
++
++  native_frame_material_opacity_ = opacity;
++  if (paint_with_native_frame_materials_) {
++    view_->SchedulePaint();
++  }
++}
++
  void CustomCornersBackground::SetPrimaryColor(
      ColorChoiceWithAlpha primary_color) {
    if (primary_color_ == primary_color) {
-@@ -158,7 +171,13 @@ void CustomCornersBackground::SetUseBack
+@@ -151,17 +174,30 @@
+   return corner;
+ }
+ 
+-void CustomCornersBackground::SetUseBackgroundBlur(bool use_background_blur) {
++void CustomCornersBackground::SetUseBackgroundBlur(
++    bool use_background_blur,
++    std::optional<gfx::Rect> clip) {
+   if (!view_->layer()) {
+     CHECK(!use_background_blur);
+     return;
    }
    auto* const layer = view_->layer();
    CHECK(!layer->fills_bounds_opaquely());
 -  const float blur_radius = use_background_blur ? kBackgroundBlurRadius : 0.0f;
+-  const std::optional<gfx::Rect> local_bounds =
+-      use_background_blur ? std::make_optional(view_->GetLocalBounds())
+-                          : std::nullopt;
 +  float blur_radius = 0.0f;
 +  if (use_background_blur) {
 +    blur_radius = paint_with_native_frame_materials_
-+                      ? kNativeFrameMaterialBlurRadius
++                      ? helium::kNativeFrameMaterialBlurRadius *
++                            native_frame_material_opacity_
 +                      : kBackgroundBlurRadius;
 +  }
 +
-   const std::optional<gfx::Rect> local_bounds =
-       use_background_blur ? std::make_optional(view_->GetLocalBounds())
-                           : std::nullopt;
-@@ -326,6 +345,10 @@ void CustomCornersBackground::Paint(gfx:
++  std::optional<gfx::Rect> local_bounds;
++  if (use_background_blur) {
++    local_bounds = view_->GetLocalBounds();
++    if (clip) {
++      local_bounds->Intersect(*clip);
++    }
++  }
+   if (layer->background_blur() == blur_radius &&
+       backdrop_filter_bounds_ == local_bounds) {
+     return;
+@@ -169,7 +205,13 @@
+ 
+   backdrop_filter_bounds_ = local_bounds;
+   if (use_background_blur) {
+-    layer->SetBackdropFilterBounds(GetBackgroundPath(*local_bounds));
++    // Clipped rather than shrunk, so it keeps the corners of the background.
++    SkPath path = GetBackgroundPath(view_->GetLocalBounds());
++    if (clip) {
++      Op(path, SkPath::Rect(gfx::RectToSkRect(*local_bounds)),
++         kIntersect_SkPathOp, &path);
++    }
++    layer->SetBackdropFilterBounds(path);
+   } else {
+     layer->ClearBackdropFilterBounds();
+   }
+@@ -326,6 +368,10 @@
    if (!visible_) {
      return;
    }
@@ -592,7 +668,7 @@
  
    if (view->layer()) {
      CHECK(!view->layer()->fills_bounds_opaquely());
-@@ -408,7 +431,18 @@ void CustomCornersBackground::Paint(gfx:
+@@ -408,7 +454,22 @@
                            !radii[2].isZero() || !radii[3].isZero();
    // Anti-aliasing an axis-aligned rectangle at fractional pixel boundaries
    // produces semi-transparent edges and visible gaps between adjacent views.
@@ -604,7 +680,11 @@
 +  if (material_color) {
 +    cc::PaintFlags flags;
 +    flags.setAntiAlias(anti_alias);
-+    flags.setColor(*material_color);
++    const SkColor4f color = SkColor4f::FromColor(
++        SkColorSetA(*material_color,
++                    base::ClampRound<U8CPU>(SkColorGetA(*material_color) *
++                                            native_frame_material_opacity_)));
++    flags.setColor(color);
 +    canvas->DrawPath(background_path, flags);
 +  } else {
 +    PaintPath(canvas, background_path, primary_color_, anti_alias);
@@ -626,20 +706,23 @@
  #include "chrome/browser/ui/views/frame/safe_invoke/safe_invoke.h"
  #include "chrome/browser/ui/views/frame/shadow_frame_view.h"
  #include "chrome/browser/ui/views/frame/tab_strip_region_view.h"
-+#include "chrome/browser/ui/views/helium/background_extension.h"
++#include "chrome/browser/ui/views/helium/contents_reflection.h"
 +#include "chrome/browser/ui/views/helium/native_frame_materials.h"
  #include "chrome/browser/ui/views/tabs/common/pinned_tab_container_view.h"
  #include "chrome/browser/ui/views/tabs/common/root_tab_collection_node.h"
  #include "chrome/browser/ui/views/tabs/common/tab_collection_node.h"
-@@ -135,6 +140,7 @@ VerticalTabStripRegionView::VerticalTabS
+@@ -135,6 +140,10 @@
    SetPaintToLayer();
    // Because corners may be transparent, this must be set to false.
    layer()->SetFillsBoundsOpaquely(false);
-+  background_extension_ = std::make_unique<helium::BackgroundExtension>(this);
++  contents_reflection_ = std::make_unique<helium::ContentsReflection>(
++      this, base::BindRepeating(
++                &VerticalTabStripRegionView::UpdateNativeFrameMaterialPaint,
++                base::Unretained(this)));
  
    SetLayoutManager(std::make_unique<views::DelegatingLayoutManager>(this));
  
-@@ -407,6 +413,67 @@ void VerticalTabStripRegionView::SetFloa
+@@ -407,6 +416,101 @@
  
    background->SetCorners(corners);
    background->SetOutline(outline);
@@ -647,6 +730,32 @@
 +}
 +
 +void VerticalTabStripRegionView::UpdateNativeFrameMaterialBackground() {
++  // Collapsed, the contents next to the tab strip are mirrored below it, so
++  // that it looks the same whether or not it floats over them. The mirror
++  // fades in as soon as the tab strip starts collapsing.
++  const bool has_material_color =
++      helium::GetNativeFrameMaterialFloatingColor(this).has_value();
++  // The material stands in for the toolbar color.
++  if (has_material_color) {
++    contents_reflection_->SetBackgroundColor(
++        GetColorProvider()->GetColor(kColorToolbar));
++  }
++  contents_reflection_->SetFloating(floating_style_ != FloatingStyle::kNone);
++  ContentsWebView* const contents =
++      has_material_color && floating_style_ != FloatingStyle::kDetached &&
++              target_collapse_state_.collapsed
++          ? GetAdjacentContents()
++          : nullptr;
++  if (contents) {
++    contents_reflection_->SetContents(contents->holder(),
++                                      contents->GetBackgroundRadii());
++  } else {
++    contents_reflection_->SetContents(nullptr);
++  }
++  UpdateNativeFrameMaterialPaint();
++}
++
++void VerticalTabStripRegionView::UpdateNativeFrameMaterialPaint() {
 +  auto* const custom_background =
 +      background() ? background()->AsA<CustomCornersBackground>() : nullptr;
 +  if (!custom_background) {
@@ -654,24 +763,32 @@
 +  }
 +
 +  // Without the material tint the tab strip stays opaque, so there is nothing
-+  // to blur. Collapsed, the contents next to it are mirrored below it, so that
-+  // it looks the same whether or not it floats over them.
++  // to blur.
 +  const bool has_material_color =
 +      helium::GetNativeFrameMaterialFloatingColor(this).has_value();
-+  views::View* const contents =
-+      has_material_color && floating_style_ != FloatingStyle::kDetached &&
-+              state_controller_->IsCollapsed()
-+          ? GetAdjacentContents()
-+          : nullptr;
-+  background_extension_->SetContents(contents);
-+
-+  const bool paint_material =
-+      floating_style_ != FloatingStyle::kNone || contents;
++  const bool floating = floating_style_ != FloatingStyle::kNone;
++  // Docked, the tab strip is solid like the rest of the frame. Floating, the
++  // material is there right away, as the tab strip covers the contents at
++  // once. Once docked again, it fades out after the mirror.
++  const float material_opacity =
++      floating ? 1.0f : contents_reflection_->GetOpacity();
++  const bool paint_material = material_opacity > 0;
++  custom_background->SetNativeFrameMaterialOpacity(material_opacity);
 +  custom_background->SetPaintWithNativeFrameMaterials(paint_material);
-+  custom_background->SetUseBackgroundBlur(paint_material && has_material_color);
++  // Below the contents, the frame is transparent where the native material
++  // shows, which the blur would take in and let the contents show through
++  // sharp along the bottom. So it stops where they do.
++  std::optional<gfx::Rect> blur_clip;
++  if (ContentsWebView* const contents = GetAdjacentContents()) {
++    const gfx::Rect contents_bounds = views::View::ConvertRectToTarget(
++        contents->holder(), this, contents->holder()->GetLocalBounds());
++    blur_clip = gfx::Rect(0, 0, width(), contents_bounds.bottom());
++  }
++  custom_background->SetUseBackgroundBlur(paint_material && has_material_color,
++                                          blur_clip);
 +}
 +
-+views::View* VerticalTabStripRegionView::GetAdjacentContents() const {
++ContentsWebView* VerticalTabStripRegionView::GetAdjacentContents() const {
 +  const MultiContentsView* const multi_contents_view =
 +      browser_view()->multi_contents_view();
 +  if (!multi_contents_view) {
@@ -679,7 +796,7 @@
 +  }
 +
 +  const gfx::Rect bounds = GetBoundsInScreen();
-+  views::View* adjacent_contents = nullptr;
++  ContentsWebView* adjacent_contents = nullptr;
 +  int adjacent_distance = 0;
 +  for (ContentsContainerView* container :
 +       multi_contents_view->contents_container_views()) {
@@ -687,8 +804,8 @@
 +      continue;
 +    }
 +
-+    views::View* const contents = container->contents_view()->holder();
-+    const gfx::Rect contents_bounds = contents->GetBoundsInScreen();
++    ContentsWebView* const contents = container->contents_view();
++    const gfx::Rect contents_bounds = contents->holder()->GetBoundsInScreen();
 +    const int distance = contents_bounds.x() >= bounds.right()
 +                             ? contents_bounds.x() - bounds.right()
 +                             : bounds.x() - contents_bounds.right();
@@ -707,7 +824,7 @@
  }
  
  void VerticalTabStripRegionView::AddedToWidget() {
-@@ -492,6 +559,7 @@ void VerticalTabStripRegionView::Layout(
+@@ -492,6 +596,7 @@
        gfx::Rect(resize_area_x, 0, resize_area_width_, bounds().height()));
    UpdateResizeAreaVisibility();
    shadow_frame_->SetBoundsRect(GetLocalBounds());
@@ -715,9 +832,17 @@
  
    // Ensure that we update the drop arrow position so that it does not render in
    // the collapsed state when expand on hover is active.
+@@ -810,6 +915,7 @@
+ 
+ void VerticalTabStripRegionView::RequestCollapse(bool collapse) {
+   target_collapse_state_.collapsed = collapse;
++  UpdateNativeFrameMaterialBackground();
+   if (collapse) {
+     suppress_expand_on_hover_ = IsCollapseButtonHovered();
+     ResetExpandOnHoverTimers();
 --- a/chrome/browser/ui/views/infobars/infobar_container_view.h
 +++ b/chrome/browser/ui/views/infobars/infobar_container_view.h
-@@ -37,6 +37,7 @@ class InfoBarContainerView : public view
+@@ -37,6 +37,7 @@
    void Layout(PassKey) override;
    gfx::Size CalculatePreferredSize(
        const views::SizeBounds& available_size) const override;
@@ -725,7 +850,7 @@
  
    // InfobarContainer:
    void PlatformSpecificAddInfoBar(infobars::InfoBar* infobar,
-@@ -85,6 +86,8 @@ class InfoBarContainerView : public view
+@@ -85,6 +86,8 @@
    bool rounded_frame_enabled_ = false;
    bool leading_side_chrome_attached_ = false;
    bool trailing_side_chrome_attached_ = false;
@@ -744,7 +869,7 @@
  #include "chrome/browser/ui/views/infobars/infobar_view.h"
  #include "chrome/grit/generated_resources.h"
  #include "components/infobars/core/infobar_delegate.h"
-@@ -125,8 +126,7 @@ InfoBarContainerView::InfoBarContainerVi
+@@ -125,8 +126,7 @@
    chrome_border_ = AddChildView(std::make_unique<ChromeBorder>());
    views::SetCascadingColorProviderColor(this, views::kCascadingBackgroundColor,
                                          kColorToolbar);
@@ -754,7 +879,7 @@
  
    GetViewAccessibility().SetRole(ax::mojom::Role::kGroup);
    GetViewAccessibility().SetName(
-@@ -157,9 +157,7 @@ void InfoBarContainerView::SetRoundedFra
+@@ -157,9 +157,7 @@
    static_cast<ChromeBorder*>(chrome_border_.get())
        ->SetState(rounded_frame_enabled, leading_side_chrome_attached,
                   trailing_side_chrome_attached);
@@ -765,7 +890,7 @@
  }
  
  void InfoBarContainerView::Layout(PassKey) {
-@@ -199,6 +197,11 @@ gfx::Size InfoBarContainerView::Calculat
+@@ -199,6 +197,11 @@
    return preferred_size;
  }
  
@@ -777,7 +902,7 @@
  void InfoBarContainerView::PlatformSpecificAddInfoBar(
      infobars::InfoBar* infobar,
      size_t position) {
-@@ -365,5 +368,15 @@ void InfoBarContainerView::UpdateQueuedC
+@@ -365,5 +368,15 @@
    }
  }
  
@@ -804,7 +929,7 @@
  #include "chrome/grit/generated_resources.h"
  #include "components/infobars/core/infobar_delegate.h"
  #include "components/strings/grit/components_strings.h"
-@@ -285,6 +285,17 @@ gfx::Size InfoBarView::CalculatePreferre
+@@ -285,6 +285,17 @@
  void InfoBarView::OnThemeChanged() {
    views::View::OnThemeChanged();
  
@@ -822,7 +947,7 @@
    // Set dark mode status so that it can be used to set a different icon image
    // that is more suitable for a dark background.
    delegate()->set_dark_mode(color_utils::IsDark(
-@@ -309,7 +320,7 @@ std::unique_ptr<views::Label> InfoBarVie
+@@ -309,7 +320,7 @@
      const std::u16string& text) const {
    auto label = std::make_unique<views::Label>(
        text, views::style::CONTEXT_DIALOG_BODY_TEXT);
@@ -831,7 +956,7 @@
    label->SetEnabledColor(kColorInfoBarForeground);
    label->SetAutoColorReadabilityEnabled(false);
    AssignLabelDetails(label.get());
-@@ -321,7 +332,7 @@ std::unique_ptr<views::StyledLabel> Info
+@@ -321,7 +332,7 @@
    auto label = std::make_unique<views::StyledLabel>();
    label->SetText(text);
    label->SetTextContext(views::style::CONTEXT_DIALOG_BODY_TEXT);
@@ -840,7 +965,7 @@
    AssignLabelDetails(label.get());
    return label;
  }
-@@ -331,7 +342,7 @@ std::unique_ptr<views::Link> InfoBarView
+@@ -331,7 +342,7 @@
      const std::optional<std::u16string>& accessible_text) {
    auto link = std::make_unique<views::Link>(
        text, views::style::CONTEXT_DIALOG_BODY_TEXT);
@@ -859,7 +984,7 @@
  #include "chrome/browser/ui/views/tabs/shared/new_tab_button_menu_model.h"
  #include "chrome/browser/ui/views/tabs/tab_strip.h"
  #include "ui/views/controls/menu/menu_runner.h"
-@@ -51,3 +52,11 @@ void NewTabButton::ShowContextMenuForVie
+@@ -51,3 +52,11 @@
          views::MenuAnchorPosition::kTopLeft, source_type);
    }
  }
@@ -873,7 +998,7 @@
 +}
 --- a/chrome/browser/ui/views/tabs/common/horizontal_tab_style_views.cc
 +++ b/chrome/browser/ui/views/tabs/common/horizontal_tab_style_views.cc
-@@ -417,7 +417,7 @@ bool HorizontalTabStyleViews::IsApparent
+@@ -417,7 +417,7 @@
    if (selection_state == TabStyle::TabSelectionState::kActive) {
      return true;
    }
@@ -882,7 +1007,7 @@
      return GetHoverOpacity() > 0.5f;
    }
    return selection_state == TabStyle::TabSelectionState::kSelected;
-@@ -661,6 +661,10 @@ SkPath HorizontalTabStyleViews::GetOverl
+@@ -661,6 +661,10 @@
  bool HorizontalTabStyleViews::ShouldPaintTabBackgroundColor(
      TabStyle::TabSelectionState selection_state,
      bool has_custom_background) const {
@@ -893,7 +1018,7 @@
    if (delegate_->IsPinned() && tabs::IsNewHorizontalPinnedTabStylingEnabled() &&
        !delegate_->IsGlassFrame()) {
      return true;
-@@ -704,9 +708,12 @@ SkColor HorizontalTabStyleViews::GetCurr
+@@ -704,9 +708,12 @@
            ? delegate_->GetView()->GetWidget()->ShouldPaintAsActive()
            : true;
    const bool frame_glass = delegate_->IsGlassFrame();
@@ -907,7 +1032,7 @@
  }
  
  TabStyle::TabSelectionState HorizontalTabStyleViews::GetSelectionState() const {
-@@ -768,7 +775,9 @@ void HorizontalTabStyleViews::PaintTabBa
+@@ -768,7 +775,9 @@
                       flags);
    }
  
@@ -942,7 +1067,7 @@
  #include "ui/gfx/geometry/insets.h"
  #include "ui/gfx/geometry/rect.h"
  #include "ui/gfx/geometry/rounded_corners_f.h"
-@@ -523,7 +524,16 @@ bool TabView::IsHoverAnimationActive() c
+@@ -523,7 +524,16 @@
  }
  
  std::optional<SkColor> TabView::GetBackgroundColor() {
@@ -960,7 +1085,7 @@
        should_fill_background_tab_color_) {
      return tab_styling()->CalculateTargetColors().background_color;
    }
-@@ -1015,7 +1025,7 @@ bool TabView::IsApparentlyActive() const
+@@ -1015,7 +1025,7 @@
    if (active_) {
      return true;
    }
@@ -969,7 +1094,7 @@
      return GetHoverOpacity() > 0.5f;
    }
    return selected_;
-@@ -1274,6 +1284,9 @@ void TabView::UpdateColors() {
+@@ -1274,6 +1284,9 @@
      should_fill_background_tab_color_ = theme_provider->GetDisplayProperty(
          ThemeProperties::SHOULD_FILL_BACKGROUND_TAB_COLOR);
    }
@@ -979,7 +1104,7 @@
    TabStyle::TabColors colors = tab_styling()->CalculateTargetColors();
    title_->SetEnabledColor(colors.foreground_color);
    close_button_->SetColors(colors);
-@@ -1372,6 +1385,25 @@ TabStyle::TabSelectionState TabView::Get
+@@ -1372,6 +1385,25 @@
                                : TabStyle::TabSelectionState::kInactive);
  }
  
@@ -1007,7 +1132,7 @@
      return false;
 --- a/chrome/browser/ui/views/tabs/common/vertical_tab_style_views.cc
 +++ b/chrome/browser/ui/views/tabs/common/vertical_tab_style_views.cc
-@@ -76,6 +76,12 @@ std::optional<SkPath> VerticalTabStyleVi
+@@ -76,6 +76,12 @@
  }
  
  void VerticalTabStyleViews::PaintTab(gfx::Canvas* canvas) const {
@@ -1020,7 +1145,7 @@
    std::optional<int> active_tab_fill_id;
    const ui::ThemeProvider* const theme_provider =
        delegate_->GetView()->GetThemeProvider();
-@@ -160,7 +166,9 @@ void VerticalTabStyleViews::PaintTabBack
+@@ -160,7 +166,9 @@
                       flags);
    }
  
@@ -1031,7 +1156,7 @@
      const ui::ThemeProvider* const theme_provider =
          delegate_->GetView()->GetThemeProvider();
      if (theme_provider) {
-@@ -178,6 +186,10 @@ bool VerticalTabStyleViews::ShouldPaintT
+@@ -178,6 +186,10 @@
      TabStyle::TabSelectionState selection_state,
      bool has_custom_background,
      bool hovered) const {
@@ -1042,7 +1167,7 @@
    if (selection_state == TabStyle::TabSelectionState::kActive ||
        selection_state == TabStyle::TabSelectionState::kSelected) {
      return true;
-@@ -197,13 +209,16 @@ bool VerticalTabStyleViews::ShouldPaintT
+@@ -197,13 +209,16 @@
  SkColor VerticalTabStyleViews::GetCurrentTabBackgroundColor(
      TabStyle::TabSelectionState selection_state) const {
    const bool frame_glass = delegate_->IsGlassFrame();
@@ -1062,7 +1187,7 @@
  TabStyle::TabSelectionState VerticalTabStyleViews::GetSelectionState() const {
 --- a/chrome/browser/ui/views/tabs/common/tab_view.h
 +++ b/chrome/browser/ui/views/tabs/common/tab_view.h
-@@ -198,6 +198,9 @@ class TabView : public views::View,
+@@ -198,6 +198,9 @@
  
    bool IsFrameActive() const;
    TabStyle::TabSelectionState GetSelectionState() const;
@@ -1074,7 +1199,15 @@
  
 --- a/chrome/browser/ui/views/frame/BUILD.gn
 +++ b/chrome/browser/ui/views/frame/BUILD.gn
-@@ -565,6 +565,7 @@ source_set("vertical_tab_strip_region_vi
+@@ -552,6 +552,7 @@
+     ":custom_corners_background",
+     ":frame",
+     ":frame_separator",
++    ":multi_contents_view",
+     ":safe_invoke",
+     ":shadow",
+     "//chrome/app:generated_resources",
+@@ -565,6 +566,7 @@
      "//chrome/browser/ui/tabs:features",
      "//chrome/browser/ui/tabs:tab_strip",
      "//chrome/browser/ui/views/animations",
@@ -1082,7 +1215,7 @@
      "//chrome/browser/ui/views/tabs/common:impl",
      "//chrome/browser/ui/views/tabs/organizer",
      "//chrome/browser/ui/web_applications",
-@@ -1209,6 +1210,7 @@ source_set("custom_corners_background_im
+@@ -1209,6 +1211,7 @@
      "//base",
      "//base:i18n",
      "//build:buildflag_header_h",
@@ -1090,7 +1223,7 @@
      "//chrome/browser/ui:layout_constants",
      "//chrome/browser/ui/color:color_headers",
      "//chrome/browser/ui/color:mixers",
-@@ -1244,6 +1246,7 @@ source_set("themed_background_impl") {
+@@ -1244,6 +1247,7 @@
      "//chrome/browser/themes",
      "//chrome/browser/ui/color:color_headers",
      "//chrome/browser/ui/views/frame:browser_view_header",
@@ -1098,7 +1231,7 @@
      "//chrome/browser/ui/views/tabs:tab_strip",
      "//ui/base",
      "//ui/color",
-@@ -1645,6 +1648,7 @@ source_set("multi_contents_background_vi
+@@ -1645,6 +1649,7 @@
    public_deps = [ ":multi_contents_background_view" ]
    deps = [
      ":themed_background",
@@ -1108,15 +1241,15 @@
      "//ui/gfx/geometry",
 --- a/chrome/browser/ui/views/helium/BUILD.gn
 +++ b/chrome/browser/ui/views/helium/BUILD.gn
-@@ -19,3 +19,28 @@ source_set("frame_corner_radius") {
+@@ -19,3 +19,28 @@
      sources += [ "frame_corner_radius_mac.mm" ]
    }
  }
 +
 +source_set("native_frame_materials") {
 +  sources = [
-+    "background_extension.cc",
-+    "background_extension.h",
++    "contents_reflection.cc",
++    "contents_reflection.h",
 +    "native_frame_materials.cc",
 +    "native_frame_materials.h",
 +  ]
@@ -1139,7 +1272,7 @@
 +}
 --- a/chrome/browser/ui/views/infobars/BUILD.gn
 +++ b/chrome/browser/ui/views/infobars/BUILD.gn
-@@ -42,6 +42,7 @@ source_set("impl") {
+@@ -42,6 +42,7 @@
    deps = [
      ":infobars",
      "//chrome/app:generated_resources_grit",
@@ -1149,7 +1282,7 @@
      "//chrome/browser/ui:view_ids",
 --- a/chrome/browser/ui/views/tabs/BUILD.gn
 +++ b/chrome/browser/ui/views/tabs/BUILD.gn
-@@ -158,6 +158,7 @@ source_set("tab_style_views_impl") {
+@@ -158,6 +158,7 @@
      "//chrome/browser/ui/browser_window",
      "//chrome/browser/ui/color:color_headers",
      "//chrome/browser/ui/tabs",
@@ -1157,7 +1290,7 @@
      "//chrome/browser/ui/views/tabs/common:impl",
      "//chrome/browser/ui/views/tabs/tab",
      "//skia",
-@@ -511,6 +512,7 @@ source_set("new_tab_button") {
+@@ -511,6 +512,7 @@
      ":tab_strip",
      ":tab_strip_button",
      "//base",
@@ -1167,7 +1300,7 @@
      "//chrome/browser/ui/browser_window",
 --- a/chrome/browser/ui/views/tabs/new_tab_button.h
 +++ b/chrome/browser/ui/views/tabs/new_tab_button.h
-@@ -41,6 +41,10 @@ class NewTabButton : public TabStripCont
+@@ -41,6 +41,10 @@
        const gfx::Point& point,
        ui::mojom::MenuSourceType source_type) override;
  
@@ -1180,7 +1313,7 @@
    std::unique_ptr<views::MenuRunner> context_menu_runner_;
 --- a/chrome/browser/ui/views/tabs/common/BUILD.gn
 +++ b/chrome/browser/ui/views/tabs/common/BUILD.gn
-@@ -101,6 +101,7 @@ source_set("impl") {
+@@ -101,6 +101,7 @@
      "//cc/paint",
      "//chrome/app/theme:theme_resources",
      "//chrome/browser/ui/helium:helium_layout_state_controller",
@@ -1190,18 +1323,20 @@
      "//chrome/browser/glic",
 --- a/chrome/browser/ui/views/frame/vertical_tab_strip_region_view.h
 +++ b/chrome/browser/ui/views/frame/vertical_tab_strip_region_view.h
-@@ -37,6 +37,10 @@
+@@ -36,7 +36,12 @@
+ #include "ui/views/layout/delegating_layout_manager.h"
  
  class BrowserView;
++class ContentsWebView;
  class VerticalTabStripBottomContainer;
 +
 +namespace helium {
-+class BackgroundExtension;
++class ContentsReflection;
 +}  // namespace helium
  class VerticalTabStripFocusSwipeController;
  class ShadowFrameView;
  
-@@ -95,6 +99,14 @@ class VerticalTabStripRegionView final
+@@ -95,6 +100,16 @@
  
    void UpdateInteriorMargin();
  
@@ -1209,14 +1344,16 @@
 +  // contents, while it floats over them, or of their mirror next to them while
 +  // it is collapsed.
 +  void UpdateNativeFrameMaterialBackground();
++  // Fades the material in and out along with the mirror.
++  void UpdateNativeFrameMaterialPaint();
 +
-+  // The holder of the visible web contents closest to the tab strip.
-+  views::View* GetAdjacentContents() const;
++  // The visible web contents closest to the tab strip.
++  ContentsWebView* GetAdjacentContents() const;
 +
    // views::LayoutDelegate:
    views::ProposedLayout CalculateProposedLayout(
        const views::SizeBounds& size_bounds) const override;
-@@ -103,6 +115,7 @@ class VerticalTabStripRegionView final
+@@ -103,6 +118,7 @@
    void AddedToWidget() override;
    void RemovedFromWidget() override;
    void Layout(PassKey) override;
@@ -1224,17 +1361,17 @@
    views::View* GetDefaultFocusableChild() override;
    gfx::Size GetMinimumSize() const override;
    gfx::Size CalculatePreferredSize(
-@@ -241,6 +254,7 @@ class VerticalTabStripRegionView final
+@@ -241,6 +257,7 @@
    raw_ptr<views::ResizeArea> resize_area_ = nullptr;
    raw_ptr<ShadowFrameView> shadow_frame_ = nullptr;
    int resize_area_width_;
-+  std::unique_ptr<helium::BackgroundExtension> background_extension_;
++  std::unique_ptr<helium::ContentsReflection> contents_reflection_;
  
    const raw_ptr<tabs::VerticalTabStripStateController> state_controller_;
    std::optional<base::CallbackListSubscription>
 --- a/chrome/browser/ui/views/location_bar/BUILD.gn
 +++ b/chrome/browser/ui/views/location_bar/BUILD.gn
-@@ -80,6 +80,7 @@ source_set("impl") {
+@@ -80,6 +80,7 @@
      "//chrome/browser/ui/dialogs",
      "//chrome/browser/ui/select_file_policy",
      "//chrome/browser/ui/views/frame:browser_view_header",
@@ -1252,7 +1389,7 @@
  #include "chrome/browser/ui/views/location_bar/content_setting_image_view.h"
  #include "chrome/browser/ui/views/location_bar/location_bar_layout.h"
  #include "chrome/browser/ui/views/location_bar/location_bar_util.h"
-@@ -1437,6 +1438,15 @@ void LocationBarView::RefreshBackground(
+@@ -1437,6 +1438,15 @@
    SkColor hovered =
        color_provider->GetColor(kColorLocationBarBackgroundHovered);
  
@@ -1270,7 +1407,7 @@
      // Match the background color to the popup if the Omnibox is visibly
 --- a/chrome/browser/ui/views/tabs/vertical/BUILD.gn
 +++ b/chrome/browser/ui/views/tabs/vertical/BUILD.gn
-@@ -73,6 +73,7 @@ source_set("impl") {
+@@ -73,6 +73,7 @@
      "//chrome/browser/ui/views/frame",
      "//chrome/browser/ui/views/frame:browser_view_header",
      "//chrome/browser/ui/views/frame:vertical_tab_strip_region_view",
@@ -1288,7 +1425,7 @@
  #include "chrome/grit/generated_resources.h"
  #include "ui/base/l10n/l10n_util.h"
  #include "ui/base/metadata/metadata_impl_macros.h"
-@@ -40,5 +41,12 @@ VerticalNewTabButton::VerticalNewTabButt
+@@ -40,5 +41,12 @@
  
  VerticalNewTabButton::~VerticalNewTabButton() = default;
  
@@ -1303,7 +1440,7 @@
  END_METADATA
 --- a/chrome/browser/ui/views/tabs/vertical/vertical_new_tab_button.h
 +++ b/chrome/browser/ui/views/tabs/vertical/vertical_new_tab_button.h
-@@ -17,6 +17,9 @@ class VerticalNewTabButton : public shar
+@@ -17,6 +17,9 @@
   public:
    explicit VerticalNewTabButton(BrowserWindowInterface* browser);
    ~VerticalNewTabButton() override;
@@ -1313,182 +1450,6 @@
  };
  
  #endif  // CHROME_BROWSER_UI_VIEWS_TABS_VERTICAL_VERTICAL_NEW_TAB_BUTTON_H_
---- /dev/null
-+++ b/chrome/browser/ui/views/helium/background_extension.cc
-@@ -0,0 +1,112 @@
-+// Copyright 2026 The Helium Authors
-+// You can use, redistribute, and/or modify this source code under
-+// the terms of the GPL-3.0 license that can be found in the LICENSE file.
-+
-+#include "chrome/browser/ui/views/helium/background_extension.h"
-+
-+#include "base/check.h"
-+#include "ui/compositor/layer.h"
-+#include "ui/compositor/layer_solid_color.h"
-+#include "ui/gfx/geometry/rect.h"
-+#include "ui/gfx/geometry/transform.h"
-+
-+namespace helium {
-+
-+BackgroundExtension::BackgroundExtension(views::View* view) : view_(view) {
-+  CHECK(view_->layer());
-+}
-+
-+BackgroundExtension::~BackgroundExtension() {
-+  SetContents(nullptr);
-+}
-+
-+void BackgroundExtension::SetContents(views::View* contents) {
-+  if (contents && !contents->layer()) {
-+    contents = nullptr;
-+  }
-+  if (contents_ == contents) {
-+    UpdateGeometry();
-+    return;
-+  }
-+
-+  observations_.RemoveAllObservations();
-+  if (clip_layer_) {
-+    view_->RemoveLayerFromRegions(clip_layer_.get());
-+  }
-+  mirror_layer_.reset();
-+  clip_layer_.reset();
-+  contents_ = contents;
-+  if (!contents_) {
-+    return;
-+  }
-+
-+  clip_layer_ = ui::Layer::Create(ui::LAYER_NOT_DRAWN);
-+  clip_layer_->SetName("BackgroundExtension");
-+  clip_layer_->SetMasksToBounds(true);
-+
-+  auto mirror_layer = std::make_unique<ui::LayerSolidColor>();
-+  mirror_layer->SetName("BackgroundExtensionMirror");
-+  mirror_layer->SetShowReflectedLayerSubtree(contents_->layer());
-+  clip_layer_->Add(mirror_layer.get());
-+  mirror_layer_ = std::move(mirror_layer);
-+  view_->AddLayerToRegion(clip_layer_.get(), views::LayerRegion::kBelow);
-+
-+  // Both move when an ancestor of theirs does, up to the one they share.
-+  for (views::View* ancestor = view_; ancestor; ancestor = ancestor->parent()) {
-+    if (ancestor->Contains(contents_)) {
-+      break;
-+    }
-+    Observe(ancestor);
-+  }
-+  for (views::View* ancestor = contents_; ancestor;
-+       ancestor = ancestor->parent()) {
-+    if (ancestor->Contains(view_)) {
-+      break;
-+    }
-+    Observe(ancestor);
-+  }
-+
-+  UpdateGeometry();
-+}
-+
-+void BackgroundExtension::UpdateGeometry() {
-+  if (!contents_) {
-+    return;
-+  }
-+
-+  // Covers |view_| exactly, so the mirror can be placed in its coordinates.
-+  clip_layer_->SetBounds(view_->layer()->bounds());
-+
-+  const gfx::Rect contents_bounds = views::View::ConvertRectToTarget(
-+      contents_, view_, contents_->GetLocalBounds());
-+  mirror_layer_->SetBounds(contents_bounds);
-+
-+  // Flip the contents over the edge that faces |view_|, so their edge is
-+  // continued below it.
-+  gfx::Transform transform;
-+  if (contents_bounds.CenterPoint().x() < view_->width() / 2) {
-+    transform.Translate(2 * contents_bounds.width(), 0);
-+  }
-+  transform.Scale(-1, 1);
-+  mirror_layer_->SetTransform(transform);
-+}
-+
-+void BackgroundExtension::Observe(views::View* view) {
-+  if (!observations_.IsObservingSource(view)) {
-+    observations_.AddObservation(view);
-+  }
-+}
-+
-+void BackgroundExtension::OnViewBoundsChanged(views::View* observed_view) {
-+  UpdateGeometry();
-+}
-+
-+void BackgroundExtension::OnViewLayerBoundsSet(views::View* observed_view) {
-+  UpdateGeometry();
-+}
-+
-+void BackgroundExtension::OnViewIsDeleting(views::View* observed_view) {
-+  SetContents(nullptr);
-+}
-+
-+}  // namespace helium
---- /dev/null
-+++ b/chrome/browser/ui/views/helium/background_extension.h
-@@ -0,0 +1,58 @@
-+// Copyright 2026 The Helium Authors
-+// You can use, redistribute, and/or modify this source code under
-+// the terms of the GPL-3.0 license that can be found in the LICENSE file.
-+
-+#ifndef CHROME_BROWSER_UI_VIEWS_HELIUM_BACKGROUND_EXTENSION_H_
-+#define CHROME_BROWSER_UI_VIEWS_HELIUM_BACKGROUND_EXTENSION_H_
-+
-+#include <memory>
-+
-+#include "base/memory/raw_ptr.h"
-+#include "base/scoped_multi_source_observation.h"
-+#include "ui/views/view.h"
-+#include "ui/views/view_observer.h"
-+
-+namespace ui {
-+class Layer;
-+}  // namespace ui
-+
-+namespace helium {
-+
-+// Mirrors the contents next to a translucent view below it, so that the view
-+// looks like it floats over the contents without them being resized. Like the
-+// background extension effect on macOS. The view has to blur what is below it,
-+// as the mirrored contents would look odd otherwise.
-+class BackgroundExtension : public views::ViewObserver {
-+ public:
-+  // |view| must paint to a layer.
-+  explicit BackgroundExtension(views::View* view);
-+  BackgroundExtension(const BackgroundExtension&) = delete;
-+  BackgroundExtension& operator=(const BackgroundExtension&) = delete;
-+  ~BackgroundExtension() override;
-+
-+  // Mirrors |contents|, which has a layer that holds what it shows, like the
-+  // holder of a WebView. Stops mirroring if null.
-+  void SetContents(views::View* contents);
-+
-+ private:
-+  // Keeps the mirror next to the contents as either of them moves.
-+  void UpdateGeometry();
-+  void Observe(views::View* view);
-+
-+  // views::ViewObserver:
-+  void OnViewBoundsChanged(views::View* observed_view) override;
-+  void OnViewLayerBoundsSet(views::View* observed_view) override;
-+  void OnViewIsDeleting(views::View* observed_view) override;
-+
-+  const raw_ptr<views::View> view_;
-+  raw_ptr<views::View> contents_ = nullptr;
-+  // Clips the mirror to |view_|, below which it is added.
-+  std::unique_ptr<ui::Layer> clip_layer_;
-+  std::unique_ptr<ui::Layer> mirror_layer_;
-+  base::ScopedMultiSourceObservation<views::View, views::ViewObserver>
-+      observations_{this};
-+};
-+
-+}  // namespace helium
-+
-+#endif  // CHROME_BROWSER_UI_VIEWS_HELIUM_BACKGROUND_EXTENSION_H_
 --- a/chrome/browser/ui/views/tabs/tab_style_views.cc
 +++ b/chrome/browser/ui/views/tabs/tab_style_views.cc
 @@ -13,9 +13,12 @@
@@ -1504,7 +1465,7 @@
  
  // static
  std::u16string ui::metadata::TypeConverter<TabStyle::TabColors>::ToString(
-@@ -74,3 +77,32 @@ std::unique_ptr<TabStyleViews> TabStyleV
+@@ -74,3 +77,32 @@
  TabStyleViews::TabStyleViews() : tab_style_(TabStyle::Get()) {}
  
  TabStyleViews::~TabStyleViews() = default;
@@ -1539,7 +1500,7 @@
 +}
 --- a/chrome/browser/ui/views/tabs/tab_style_views.h
 +++ b/chrome/browser/ui/views/tabs/tab_style_views.h
-@@ -150,6 +150,17 @@ class TabStyleViews {
+@@ -150,6 +150,17 @@
  
    const TabStyle* tab_style() const { return tab_style_; }
  
@@ -1557,3 +1518,527 @@
   private:
    const raw_ptr<const TabStyle> tab_style_;
  };
+--- /dev/null
++++ b/chrome/browser/ui/views/helium/contents_reflection.cc
+@@ -0,0 +1,391 @@
++// Copyright 2026 The Helium Authors
++// You can use, redistribute, and/or modify this source code under
++// the terms of the GPL-3.0 license that can be found in the LICENSE file.
++
++#include "chrome/browser/ui/views/helium/contents_reflection.h"
++
++#include <algorithm>
++#include <initializer_list>
++#include <utility>
++
++#include "base/check.h"
++#include "base/functional/bind.h"
++#include "base/location.h"
++#include "base/numerics/safe_conversions.h"
++#include "base/task/sequenced_task_runner.h"
++#include "base/time/time.h"
++#include "chrome/browser/ui/views/helium/native_frame_materials.h"
++#include "ui/compositor/layer.h"
++#include "ui/compositor/layer_solid_color.h"
++#include "ui/gfx/geometry/insets.h"
++#include "ui/gfx/geometry/linear_gradient.h"
++#include "ui/gfx/geometry/rect.h"
++#include "ui/gfx/geometry/transform.h"
++
++namespace helium {
++namespace {
++
++// Matches the vertical tab strip expanding over the contents, which is what
++// shows the mirror.
++constexpr base::TimeDelta kFadeDuration = base::Milliseconds(250);
++
++// Towards the top of the view, the background fades in over what is behind
++// it, and the mirror over the background after it, so the view joins whatever
++// is above it smoothly.
++constexpr int kBackgroundFadeHeight = 48;
++constexpr int kTopFadeHeight = 128;
++
++// The share of a fade in over which what covers the mirror fades in, before
++// the mirror fades in over the rest. Fading out, the reverse.
++constexpr float kCoverShare = 1.0f / 3;
++
++// A vertical gradient of |steps|, each a y in |bounds|' coordinates and an
++// alpha, scaled by |opacity|. Steps that would not increase are left out, as
++// where fades overlap.
++gfx::LinearGradient GetVerticalFade(
++    const gfx::Rect& bounds,
++    float opacity,
++    std::initializer_list<std::pair<int, float>> steps) {
++  gfx::LinearGradient gradient(/*angle=*/-90);
++  if (bounds.IsEmpty()) {
++    return gradient;
++  }
++  for (const auto& [y, alpha] : steps) {
++    const float fraction = std::clamp(
++        static_cast<float>(y - bounds.y()) / bounds.height(), 0.0f, 1.0f);
++    const size_t count = gradient.step_count();
++    if (!count || gradient.steps()[count - 1].fraction < fraction) {
++      gradient.AddStep(fraction, base::ClampRound<uint8_t>(alpha * opacity *
++                                                           SK_AlphaOPAQUE));
++    }
++  }
++  return gradient;
++}
++
++// Eases in from transparent at the top of |bounds| to |opacity| |height|
++// below.
++gfx::LinearGradient GetEasedFadeIn(const gfx::Rect& bounds,
++                                   int height,
++                                   float opacity) {
++  gfx::LinearGradient gradient(/*angle=*/-90);
++  if (bounds.IsEmpty()) {
++    return gradient;
++  }
++  const size_t last = kNativeFrameMaterialFadeIn.size() - 1;
++  for (size_t i = 0; i <= last; ++i) {
++    const float fraction =
++        std::min(1.0f, static_cast<float>(height * i) / last / bounds.height());
++    if (i && gradient.steps()[i - 1].fraction >= fraction) {
++      break;
++    }
++    gradient.AddStep(fraction,
++                     base::ClampRound<uint8_t>(kNativeFrameMaterialFadeIn[i] *
++                                               opacity * SK_AlphaOPAQUE));
++  }
++  return gradient;
++}
++
++}  // namespace
++
++ContentsReflection::ContentsReflection(views::View* view,
++                                       base::RepeatingClosure opacity_changed)
++    : view_(view), opacity_changed_(std::move(opacity_changed)) {
++  CHECK(view_->layer());
++  animation_.SetSlideDuration(kFadeDuration);
++  floating_animation_.SetSlideDuration(kFadeDuration);
++}
++
++ContentsReflection::~ContentsReflection() {
++  Detach();
++}
++
++void ContentsReflection::SetContents(
++    views::View* contents,
++    const gfx::RoundedCornersF& contents_radii) {
++  reattach_contents_.SetView(nullptr);
++  contents_radii_ = contents_radii;
++  if (contents && !contents->layer()) {
++    contents = nullptr;
++  }
++  if (contents && contents != contents_) {
++    Detach();
++    Attach(contents);
++  }
++
++  // Nothing to fade before the view is shown.
++  const bool showing = contents;
++  if (!view_->IsDrawn()) {
++    animation_.Reset(showing ? 1 : 0);
++    if (!showing) {
++      Detach();
++    }
++    UpdateOpacity();
++  } else if (showing) {
++    animation_.Show();
++  } else if (contents_) {
++    animation_.Hide();
++  }
++  UpdateGeometry();
++}
++
++void ContentsReflection::SetBackgroundColor(SkColor color) {
++  background_color_ = SkColorSetA(color, SK_AlphaOPAQUE);
++  if (background_layer_) {
++    background_layer_->SetColor(SkColor4f::FromColor(background_color_));
++    contents_fade_layer_->SetColor(SkColor4f::FromColor(background_color_));
++  }
++}
++
++void ContentsReflection::SetFloating(bool floating) {
++  if (!view_->IsDrawn()) {
++    floating_animation_.Reset(floating ? 1 : 0);
++    UpdateOpacity();
++  } else if (floating) {
++    floating_animation_.Show();
++  } else {
++    floating_animation_.Hide();
++  }
++}
++
++float ContentsReflection::GetOpacity() const {
++  return std::min(1.0f, GetFadeValue() / kCoverShare);
++}
++
++float ContentsReflection::GetFadeValue() const {
++  return contents_ ? animation_.GetCurrentValue() *
++                         floating_animation_.GetCurrentValue()
++                   : 0;
++}
++
++void ContentsReflection::Attach(views::View* contents) {
++  contents_ = contents;
++  contents_layer_observation_.Observe(contents_->layer());
++  clip_layer_ = ui::Layer::Create(ui::LAYER_NOT_DRAWN);
++  clip_layer_->SetName("ContentsReflection");
++  clip_layer_->SetMasksToBounds(true);
++
++  auto background_layer = std::make_unique<ui::LayerSolidColor>();
++  background_layer->SetName("ContentsReflectionBackground");
++  background_layer->SetColor(SkColor4f::FromColor(background_color_));
++  clip_layer_->Add(background_layer.get());
++  background_layer_ = std::move(background_layer);
++
++  auto contents_fade_layer = std::make_unique<ui::LayerSolidColor>();
++  contents_fade_layer->SetName("ContentsReflectionContentsFade");
++  contents_fade_layer->SetColor(SkColor4f::FromColor(background_color_));
++  clip_layer_->Add(contents_fade_layer.get());
++  contents_fade_layer_ = std::move(contents_fade_layer);
++
++  auto mirror_layer = std::make_unique<ui::LayerSolidColor>();
++  mirror_layer->SetName("ContentsReflectionMirror");
++  mirror_layer->SetShowReflectedLayerSubtree(contents_->layer());
++  clip_layer_->Add(mirror_layer.get());
++  mirror_layer_ = std::move(mirror_layer);
++
++  auto blur_layer = std::make_unique<ui::LayerSolidColor>();
++  blur_layer->SetName("ContentsReflectionBlur");
++  blur_layer->SetFillsBoundsOpaquely(false);
++  blur_layer->SetBackgroundBlur(kNativeFrameMaterialBlurRadius);
++  clip_layer_->Add(blur_layer.get());
++  blur_layer_ = std::move(blur_layer);
++  view_->AddLayerToRegion(clip_layer_.get(), views::LayerRegion::kBelow);
++
++  corner_clip_layer_ = ui::Layer::Create(ui::LAYER_NOT_DRAWN);
++  corner_clip_layer_->SetName("ContentsReflectionCorner");
++  corner_clip_layer_->SetMasksToBounds(true);
++  auto corner_layer = std::make_unique<ui::LayerSolidColor>();
++  corner_layer->SetShowReflectedLayerSubtree(contents_->layer());
++  corner_clip_layer_->Add(corner_layer.get());
++  corner_layer_ = std::move(corner_layer);
++  view_->AddLayerToRegion(corner_clip_layer_.get(), views::LayerRegion::kBelow);
++
++  // Both move when an ancestor of theirs does, up to the one they share.
++  for (views::View* ancestor = view_; ancestor; ancestor = ancestor->parent()) {
++    if (ancestor->Contains(contents_)) {
++      break;
++    }
++    Observe(ancestor);
++  }
++  for (views::View* ancestor = contents_; ancestor;
++       ancestor = ancestor->parent()) {
++    if (ancestor->Contains(view_)) {
++      break;
++    }
++    Observe(ancestor);
++  }
++}
++
++void ContentsReflection::Detach() {
++  observations_.RemoveAllObservations();
++  contents_layer_observation_.Reset();
++  if (clip_layer_) {
++    view_->RemoveLayerFromRegions(clip_layer_.get());
++    view_->RemoveLayerFromRegions(corner_clip_layer_.get());
++  }
++  corner_layer_.reset();
++  corner_clip_layer_.reset();
++  blur_layer_.reset();
++  mirror_layer_.reset();
++  contents_fade_layer_.reset();
++  background_layer_.reset();
++  clip_layer_.reset();
++  contents_ = nullptr;
++}
++
++void ContentsReflection::UpdateGeometry() {
++  if (!contents_) {
++    return;
++  }
++
++  // What covers the mirror, its blur and the tint of |view_|, fades ahead of
++  // it.
++  const float cover_opacity = GetOpacity();
++  const float opacity = std::clamp(
++      (GetFadeValue() - kCoverShare) / (1 - kCoverShare), 0.0f, 1.0f);
++
++  // Covers |view_| exactly, so the mirror can be placed in its coordinates.
++  clip_layer_->SetBounds(view_->layer()->bounds());
++
++  const gfx::Rect contents_bounds = views::View::ConvertRectToTarget(
++      contents_, view_, contents_->GetLocalBounds());
++  mirror_layer_->SetBounds(contents_bounds);
++
++  if (!contents_bounds.IsEmpty()) {
++    const gfx::LinearGradient gradient =
++        GetVerticalFade(contents_bounds, opacity,
++                        {{kBackgroundFadeHeight, 0}, {kTopFadeHeight, 1}});
++    if (mirror_layer_->gradient_mask() != gradient) {
++      mirror_layer_->SetGradientMask(gradient);
++    }
++  }
++
++  // Flip the contents over the edge that faces |view_|, so their edge is
++  // continued below it.
++  const bool contents_before =
++      contents_bounds.CenterPoint().x() < view_->width() / 2;
++  gfx::Transform transform;
++  if (contents_before) {
++    transform.Translate(2 * contents_bounds.width(), 0);
++  }
++  transform.Scale(-1, 1);
++  mirror_layer_->SetTransform(transform);
++
++  // Square off the corner the contents round at the bottom of the edge the
++  // mirror continues them along. Like |clip_layer_|, it is placed next to
++  // |view_|'s layer.
++  const int corner_radius =
++      base::ClampCeil(contents_before ? contents_radii_.lower_right()
++                                      : contents_radii_.lower_left());
++  gfx::Rect corner_bounds(
++      contents_before ? contents_bounds.right() - corner_radius
++                      : contents_bounds.x(),
++      contents_bounds.bottom() - corner_radius, corner_radius, corner_radius);
++  corner_bounds.Intersect(contents_bounds);
++  corner_layer_->SetBounds(contents_bounds - corner_bounds.OffsetFromOrigin());
++  const gfx::LinearGradient corner_gradient =
++      GetVerticalFade(gfx::Rect(contents_bounds.size()), opacity,
++                      {{0, 1}, {contents_bounds.height(), 1}});
++  if (corner_layer_->gradient_mask() != corner_gradient) {
++    corner_layer_->SetGradientMask(corner_gradient);
++  }
++  corner_bounds.Offset(view_->layer()->bounds().OffsetFromOrigin());
++  corner_clip_layer_->SetBounds(corner_bounds);
++
++  // Only below the mirror, as |view_| may float over the contents themselves.
++  gfx::Rect mirror_bounds =
++      transform.MapRect(gfx::Rect(contents_bounds.size()));
++  mirror_bounds.Offset(contents_bounds.OffsetFromOrigin());
++  mirror_bounds.Intersect(gfx::Rect(clip_layer_->bounds().size()));
++  background_layer_->SetBounds(mirror_bounds);
++  blur_layer_->SetBounds(mirror_bounds);
++  if (!mirror_bounds.IsEmpty()) {
++    const gfx::LinearGradient gradient =
++        GetEasedFadeIn(mirror_bounds, kBackgroundFadeHeight, opacity);
++    if (background_layer_->gradient_mask() != gradient) {
++      background_layer_->SetGradientMask(gradient);
++    }
++    const gfx::LinearGradient blur_gradient =
++        GetEasedFadeIn(mirror_bounds, kBackgroundFadeHeight, cover_opacity);
++    if (blur_layer_->gradient_mask() != blur_gradient) {
++      blur_layer_->SetGradientMask(blur_gradient);
++    }
++  }
++
++  // The rest of |view_|, beside the mirror. The background is already there
++  // where the mirror starts to fade in, and fades out as it does.
++  gfx::Rect contents_fade_bounds(clip_layer_->bounds().size());
++  if (mirror_bounds.x() > contents_fade_bounds.x()) {
++    contents_fade_bounds.set_width(mirror_bounds.x());
++  } else {
++    contents_fade_bounds.Inset(
++        gfx::Insets::TLBR(0, mirror_bounds.right(), 0, 0));
++  }
++  contents_fade_layer_->SetBounds(contents_fade_bounds);
++  if (!contents_fade_bounds.IsEmpty()) {
++    const gfx::LinearGradient gradient = GetVerticalFade(
++        contents_fade_bounds, cover_opacity,
++        {{0, 1}, {kBackgroundFadeHeight, 1}, {kTopFadeHeight, 0}});
++    if (contents_fade_layer_->gradient_mask() != gradient) {
++      contents_fade_layer_->SetGradientMask(gradient);
++    }
++  }
++}
++
++void ContentsReflection::UpdateOpacity() {
++  // Through the gradients, as a mirror does not show inside anything with an
++  // opacity of its own.
++  UpdateGeometry();
++  opacity_changed_.Run();
++}
++
++void ContentsReflection::AnimationProgressed(const gfx::Animation* animation) {
++  UpdateOpacity();
++}
++
++void ContentsReflection::AnimationEnded(const gfx::Animation* animation) {
++  if (animation == &animation_ && animation_.GetCurrentValue() == 0) {
++    Detach();
++  }
++  UpdateOpacity();
++}
++
++void ContentsReflection::Observe(views::View* view) {
++  if (!observations_.IsObservingSource(view)) {
++    observations_.AddObservation(view);
++  }
++}
++
++void ContentsReflection::OnViewBoundsChanged(views::View* observed_view) {
++  UpdateGeometry();
++}
++
++void ContentsReflection::OnViewLayerBoundsSet(views::View* observed_view) {
++  UpdateGeometry();
++}
++
++void ContentsReflection::ReattachContents() {
++  views::View* const contents = reattach_contents_.view();
++  if (contents && !contents_) {
++    SetContents(contents, contents_radii_);
++  }
++}
++
++void ContentsReflection::LayerDestroyed(ui::Layer* layer) {
++  // The contents usually get another layer right after, so mirror them again
++  // once they have, unless the mirror was fading out anyway.
++  if (animation_.IsShowing()) {
++    reattach_contents_.SetView(contents_);
++    base::SequencedTaskRunner::GetCurrentDefault()->PostTask(
++        FROM_HERE, base::BindOnce(&ContentsReflection::ReattachContents,
++                                  weak_ptr_factory_.GetWeakPtr()));
++  }
++  Detach();
++}
++
++void ContentsReflection::OnViewIsDeleting(views::View* observed_view) {
++  // Not worth telling |view_| about, as it may be going away too.
++  animation_.Reset(0);
++  Detach();
++}
++
++}  // namespace helium
+--- /dev/null
++++ b/chrome/browser/ui/views/helium/contents_reflection.h
+@@ -0,0 +1,127 @@
++// Copyright 2026 The Helium Authors
++// You can use, redistribute, and/or modify this source code under
++// the terms of the GPL-3.0 license that can be found in the LICENSE file.
++
++#ifndef CHROME_BROWSER_UI_VIEWS_HELIUM_CONTENTS_REFLECTION_H_
++#define CHROME_BROWSER_UI_VIEWS_HELIUM_CONTENTS_REFLECTION_H_
++
++#include <memory>
++
++#include "base/functional/callback.h"
++#include "base/memory/raw_ptr.h"
++#include "base/memory/weak_ptr.h"
++#include "base/scoped_multi_source_observation.h"
++#include "base/scoped_observation.h"
++#include "third_party/skia/include/core/SkColor.h"
++#include "ui/compositor/layer_observer.h"
++#include "ui/gfx/animation/animation_delegate.h"
++#include "ui/gfx/animation/slide_animation.h"
++#include "ui/gfx/geometry/rounded_corners_f.h"
++#include "ui/views/view.h"
++#include "ui/views/view_observer.h"
++#include "ui/views/view_tracker.h"
++
++namespace ui {
++class Layer;
++class LayerSolidColor;
++}  // namespace ui
++
++namespace helium {
++
++// Mirrors the contents next to a translucent view below it, so that the view
++// looks like it floats over the contents without them being resized. Like
++// SwiftUI's backgroundExtensionEffect on macOS. The mirror is blurred, as it
++// would look odd otherwise.
++class ContentsReflection : public views::ViewObserver,
++                           public ui::LayerObserver,
++                           public gfx::AnimationDelegate {
++ public:
++  // |view| must paint to a layer. |opacity_changed| runs as the mirror fades,
++  // so that the view can fade what it paints over it along with it.
++  ContentsReflection(views::View* view, base::RepeatingClosure opacity_changed);
++  ContentsReflection(const ContentsReflection&) = delete;
++  ContentsReflection& operator=(const ContentsReflection&) = delete;
++  ~ContentsReflection() override;
++
++  // Mirrors |contents|, which has a layer that holds what it shows, like the
++  // holder of a WebView, with the corners it is rounded with. Fades the mirror
++  // in, or out if null.
++  void SetContents(views::View* contents,
++                   const gfx::RoundedCornersF& contents_radii = {});
++
++  // Sets the color the mirror fades into, made opaque. Under a mirror that
++  // fades into transparency instead, its blur would thin out where what is
++  // next to it is transparent, like the native frame material, and let the
++  // sharp mirror show through. It should resemble whatever is above the view,
++  // which it fades into in turn.
++  void SetBackgroundColor(SkColor color);
++
++  // Shows the mirror while |view_| floats over the contents next to it,
++  // fading it in and out. Otherwise |view_| looks like the rest of the frame.
++  void SetFloating(bool floating);
++
++  // How much of what |view_| paints over the mirror should show, from 0 to 1.
++  // It fades ahead of the mirror, which only shows once it is all there, so
++  // that the mirror never shows sharp or barely covered.
++  float GetOpacity() const;
++
++ private:
++  void Attach(views::View* contents);
++  void Detach();
++  // Keeps the mirror next to the contents as either of them moves.
++  void UpdateGeometry();
++  void UpdateOpacity();
++  // How far the mirror has faded in, from 0 to 1.
++  float GetFadeValue() const;
++  void Observe(views::View* view);
++  // Mirrors the contents whose layer went away again, if they have another.
++  void ReattachContents();
++
++  // gfx::AnimationDelegate:
++  void AnimationProgressed(const gfx::Animation* animation) override;
++  void AnimationEnded(const gfx::Animation* animation) override;
++
++  // views::ViewObserver:
++  void OnViewBoundsChanged(views::View* observed_view) override;
++  void OnViewLayerBoundsSet(views::View* observed_view) override;
++  void OnViewIsDeleting(views::View* observed_view) override;
++
++  // ui::LayerObserver:
++  void LayerDestroyed(ui::Layer* layer) override;
++
++  const raw_ptr<views::View> view_;
++  const base::RepeatingClosure opacity_changed_;
++  // Stays set while the mirror fades out.
++  raw_ptr<views::View> contents_ = nullptr;
++  // Clips the mirror to |view_|, below which it is added.
++  std::unique_ptr<ui::Layer> clip_layer_;
++  std::unique_ptr<ui::LayerSolidColor> background_layer_;
++  // Where |view_| floats over the contents themselves, fades them in below
++  // whatever is above it, like the mirror.
++  std::unique_ptr<ui::LayerSolidColor> contents_fade_layer_;
++  std::unique_ptr<ui::Layer> mirror_layer_;
++  // Blurs the mirror. Fades in from the top, as a blur darkens towards its
++  // edge.
++  std::unique_ptr<ui::Layer> blur_layer_;
++  // Shows the contents themselves in the bottom corner they round next to
++  // the mirror, as the mirror continues them square.
++  std::unique_ptr<ui::Layer> corner_clip_layer_;
++  std::unique_ptr<ui::Layer> corner_layer_;
++  gfx::RoundedCornersF contents_radii_;
++  SkColor background_color_ = SK_ColorTRANSPARENT;
++  gfx::SlideAnimation animation_{this};
++  gfx::SlideAnimation floating_animation_{this};
++  base::ScopedMultiSourceObservation<views::View, views::ViewObserver>
++      observations_{this};
++  // The mirror has to stop reflecting the layer of the contents before it is
++  // destroyed, as a NativeViewHost does when what it hosts changes.
++  base::ScopedObservation<ui::Layer, ui::LayerObserver>
++      contents_layer_observation_{this};
++  // The contents whose layer was destroyed, until they are mirrored again.
++  views::ViewTracker reattach_contents_;
++  base::WeakPtrFactory<ContentsReflection> weak_ptr_factory_{this};
++};
++
++}  // namespace helium
++
++#endif  // CHROME_BROWSER_UI_VIEWS_HELIUM_CONTENTS_REFLECTION_H_
