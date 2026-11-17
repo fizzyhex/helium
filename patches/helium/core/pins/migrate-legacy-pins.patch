@@ -1,0 +1,31 @@
+--- a/chrome/browser/ui/tabs/helium_pins_sync.cc
++++ b/chrome/browser/ui/tabs/helium_pins_sync.cc
+@@ -355,6 +355,7 @@ std::vector<HeliumPinsSync::Pin>::iterat
+ }
+ 
+ void HeliumPinsSync::LoadPins() {
++  bool migrated = false;
+   for (const base::Value& value :
+        profile_->GetPrefs()->GetList(prefs::kPinnedTabs)) {
+     const base::DictValue* const dict = value.GetIfDict();
+@@ -365,8 +366,20 @@ void HeliumPinsSync::LoadPins() {
+     const std::string* const id = dict->FindString(kIdKey);
+     if (id && !id->empty() && FindPin(*id) == pins_.end()) {
+       pins_.push_back({*id, GURL(*url)});
++      continue;
++    }
++
++    // TODO: Remove this migration after January 2027. Lists written by
++    // PinnedTabCodec have no ids and repeat a URL for every window that pinned
++    // it, so the pins of all windows are merged into one set.
++    migrated = true;
++    if (!std::ranges::contains(pins_, GURL(*url), &Pin::url)) {
++      pins_.push_back({CreatePinId(), GURL(*url)});
+     }
+   }
++  if (migrated) {
++    SavePins();
++  }
+ }
+ 
+ void HeliumPinsSync::LoadSplits() {
